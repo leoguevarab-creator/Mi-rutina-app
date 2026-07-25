@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>LifeRoutine Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LifeRoutine">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    
+    <style>
+        /* Estilos críticos inline */
+        body { margin: 0; font-family: Arial, sans-serif; }
+        .loading { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>🌟 LifeRoutine Pro</h1>
+            <div class="date-display"></div>
+        </header>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-view="daily">📅 Diario</button>
+            <button class="nav-btn" data-view="weekly">📊 Semanal</button>
+            <button class="nav-btn" data-view="challenges">🏆 Retos</button>
+            <button class="nav-btn" data-view="stats">📊 Stats</button>
+        </nav>
+
+        <main id="main-content">
+            <section id="daily-view" class="view active">
+                <h2>Actividades de Hoy</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="daily-progress">0%</div>
+                </div>
+                
+                <div class="categories">
+                    <div class="category-card" data-category="work">
+                        <h3>💼 Trabajo</h3>
+                        <div class="activities" id="work-activities">
+                            <p style="color: #999;">Cargando...</p>
+                        </div>
+                        <button class="add-activity-btn" onclick="addActivity('work')">+ Agregar Actividad</button>
+                    </div>
+
+                    <div class="category-card" data-category="health">
+                        <h3>💪 Salud</h3>
+                        <div class="activities" id="health-activities">
+                            <p style="color: #999;">Cargando...</p>
+                        </div>
+                        <button class="add-activity-btn" onclick="addActivity('health')">+ Agregar Actividad</button>
+                    </div>
+
+                    <div class="category-card" data-category="intellectual">
+                        <h3>🧠 Intelectual</h3>
+                        <div class="activities" id="intellectual-activities">
+                            <p style="color: #999;">Cargando...</p>
+                        </div>
+                        <button class="add-activity-btn" onclick="addActivity('intellectual')">+ Agregar Actividad</button>
+                    </div>
+
+                    <div class="category-card" data-category="purpose">
+                        <h3>🎯 Propósito</h3>
+                        <div class="activities" id="purpose-activities">
+                            <p style="color: #999;">Cargando...</p>
+                        </div>
+                        <button class="add-activity-btn" onclick="addActivity('purpose')">+ Agregar Actividad</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="weekly-view" class="view">
+                <h2>Resumen Semanal</h2>
+                <div id="week-grid">
+                    <p style="color: #999; padding: 20px;">Próximamente</p>
+                </div>
+            </section>
+
+            <section id="challenges-view" class="view">
+                <h2>🏆 Retos Activos</h2>
+                <div id="challenges-container">
+                    <p style="color: #999;">Cargando retos...</p>
+                </div>
+            </section>
+
+            <section id="stats-view" class="view">
+                <h2>📊 Estadísticas</h2>
+                <div style="padding: 20px;">
+                    <p style="color: #999;">Cargando estadísticas...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="activity-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>➕ Nueva Actividad</h3>
+            <form id="activity-form">
+                <input type="hidden" id="activity-category" value="">
+                
+                <label>Nombre de la actividad:</label>
+                <input type="text" id="activity-name" placeholder="Ej: Leer 30 minutos" required>
+                
+                <label>Meta diaria (opcional):</label>
+                <input type="number" id="activity-target" placeholder="Ej: 100">
+                
+                <label>Tipo de actividad:</label>
+                <select id="activity-type">
+                    <option value="boolean">✅ Completado/No completado</option>
+                    <option value="counter">🔢 Contador (flexiones, páginas)</option>
+                    <option value="timer">⏱️ Tiempo (minutos)</option>
+                </select>
+                
+                <div class="sub-activities">
+                    <h4>📋 Sub-actividades (items):</h4>
+                    <div id="sub-activities-list"></div>
+                    <button type="button" onclick="addSubActivity()" style="background: #f0f0f0; border: 1px dashed #999; width: 100%; padding: 8px; margin-top: 5px; cursor: pointer;">
+                        + Agregar Item
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button type="submit" style="flex: 1; background: #4A90E2; color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 16px;">
+                        ✅ Guardar Actividad
+                    </button>
+                    <button type="button" onclick="closeModal()" style="flex: 1; background: #95a5a6; color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 16px;">
+                        ❌ Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    
+    <!-- Registro del Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Error al registrar Service Worker:', error);
+                    });
+            });
+        }
+        
+        // Botón de instalación manual
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('App instalable detectada');
+            // Guardar el evento para usarlo después
+            window.deferredPrompt = e;
+        });
+        
+        // Detectar cuando se instala
+        window.addEventListener('appinstalled', () => {
+            console.log('App instalada exitosamente');
+        });
+    </script>
+</body>
+</html>
